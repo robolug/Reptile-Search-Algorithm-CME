@@ -1,0 +1,142 @@
+clc;
+clear;
+close all;
+nRbt = 2;
+nOrient = 2;
+nIter = 100;
+bound = 25;
+d = 1; %step
+SearchAgents_no=30;
+
+% node = ros2node('MATLAB');
+% velocityPub = ros2publisher(node, "/position ", "geometry_msgs/Point");
+% msg = ros2message(velocityPub);
+
+
+% 
+a = 2*randn;
+adamp = a/nIter;
+dim = 1;
+varSize = [1 dim];
+
+ray_lngth = 1.5; % max_range value in the paper
+
+
+Vrobot = 1;
+
+anglesClsion = [pi/2,pi/4,0,7*pi/4,3*pi/2,5*pi/4,pi,3*pi/4];
+thresholdClsionDttn = 0.9; %threshold of collition detection
+maxrangeClsion = 2; %maxrange to detect collition
+
+
+
+ for i=1:timeSteps
+map = robotics.OccupancyGrid(bound,bound,15); %resolution is the number of pixels in one cell; no needs to consider it below
+show (map);
+hold on
+
+%% obstacles
+cntx = bound/2;
+cnty = bound/2;
+s = cnty/0.1;
+A(1,s) = cntx-1;
+A(1:s) = cntx;
+B = cnty:0.1:bound-0.1;
+C = [A; B];
+C = transpose(C);
+A = A/2.5;
+D = [B; A];
+D = transpose(D);
+% q = (bound/0.1) - 10;
+q = (bound/0.1);
+E(1,q) = bound-1;
+E(1:q) = 0.1;
+I(1,q) = bound-1;
+I(1:q) = bound-0.1;
+% F = 1:0.1:bound-0.1;
+F = 0:0.1:bound-0.1;
+H = [E;F];
+H = transpose(H);
+G = [I;F];
+G = transpose(G);
+J = [F;I];
+J = transpose(J);
+W = [F;E];
+W = transpose(W);
+d_ = 0;
+S = 15:0.1:20;
+S_(1:51) = 5;
+S__ = [S;S_];
+obs_1 = transpose(S__);
+Y = 0:0.1:2;
+Y_(1:21) = 14;
+Y__ = [Y;Y_];
+obs_2 = transpose(Y__);
+T(1:21) = 6;
+T_ = 6:0.1:8;
+T__ = [T;T_];
+obs_3 = transpose(T__);
+Z(1:21) = 15;
+Z_ = 11:0.1:13;
+Z__ = [Z;Z_];
+obs_4 = transpose(Z__);
+M(1:6) = 6;
+M_ = 12:0.1:12.5;
+M__ = [M;M_];
+obs_6 = transpose(M__);
+
+O(1:21) = 15;
+O_ = 18:0.1:20;
+O__ = [O;O_];
+obs_7 = transpose(O__);
+
+X(1:21) = 5;
+X_ = 18:0.1:20;
+X__ = [X;X_];
+obs_5 = transpose(X__);
+
+R = 7:0.1:9;
+R_(1:21) = 1;
+R__ = [R;R_];
+obs_8 = transpose(R__);
+
+
+g=setOccupancy(map, W, 1);
+setOccupancy(map, obs_3, 1)
+setOccupancy(map, obs_2, 1)
+setOccupancy(map, obs_4, 1)
+setOccupancy(map, obs_5, 1)
+setOccupancy(map, obs_6, 1)
+setOccupancy(map, obs_7, 1)
+setOccupancy(map, obs_8, 1)
+
+
+
+% upper vertical
+setOccupancy(map, C, 1)
+% H left vertical
+setOccupancy(map, H, 1)
+% G right vertical
+setOccupancy(map, G, 1)
+% J upper horizontal
+setOccupancy(map, J, 1)
+setOccupancy(map, W, 1);
+
+% setOccupancy(map, obs_1, 1)
+
+
+
+%% tunnel obstacle
+% right horizontal
+% setOccupancy(map, D, 1)
+
+
+inflate(map,1)
+
+show(map)
+for j=1:n
+        g(j,1)=g(j,1)+1;
+        g(j,2)=g(j,2)+1;
+end
+
+end
